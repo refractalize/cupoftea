@@ -264,9 +264,7 @@ process.addListener('exit', function () {
 });
 
 process.on('uncaughtException', function(err) {
-    if (_(expectedExceptions).contains(err)) {
-        //console.log(err);
-    } else {
+    if (!_(expectedExceptions).contains(err)) {
         throw err;
     }
 });

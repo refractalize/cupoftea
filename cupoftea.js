@@ -117,14 +117,18 @@ var Callbacks = function (runStack) {
     var currentSpecResultsCalled = false;
     var hasCallbacks = false;
 
+    var results = function (exception) {
+        if (!currentSpecResultsCalled) {
+            runStack.results(exception);
+            currentSpecResultsCalled = true;
+        }
+    };
+
     this.shouldNotCall = function () {
         hasCallbacks = true;
         var error = new Error("shouldn't be called");
         return function () {
-            if (!currentSpecResultsCalled) {
-                runStack.results(error);
-                currentSpecResultsCalled = true;
-            }
+            results(error);
         };
     };
 
@@ -132,20 +136,17 @@ var Callbacks = function (runStack) {
         hasCallbacks = true;
         numberOfCallbacks++;
         return function () {
+            numberOfCallbacks--;
             try {
                 var result = f.apply(null, arguments);
             } catch (e) {
-                runStack.results(e);
+                results(e);
                 expectedExceptions.push(e);
                 throw e;
             }
 
-            numberOfCallbacks--;
             if (numberOfCallbacks === 0) {
-                if (!currentSpecResultsCalled) {
-                    runStack.results();
-                    currentSpecResultsCalled = true;
-                }
+                results();
             }
 
             return result;
@@ -158,9 +159,9 @@ var Callbacks = function (runStack) {
 
     this.assertCallbacks = function () {
         if (numberOfCallbacks > 0) {
-            runStack.results('not called');
+            results('not called');
         } else if (hasCallbacks) {
-            runStack.results();
+            results();
         }
     };
 };
@@ -264,7 +265,7 @@ process.addListener('exit', function () {
 
 process.on('uncaughtException', function(err) {
     if (_(expectedExceptions).contains(err)) {
-        console.log(err);
+        //console.log(err);
     } else {
         throw err;
     }

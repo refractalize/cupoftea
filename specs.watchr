@@ -49,4 +49,4 @@ watch '.*' do |code|
     test($mappers.find_spec_for(code[0]))
 end
 
-test('test.js')
+test('cupoftea_test.js')

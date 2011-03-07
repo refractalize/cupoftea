@@ -27,7 +27,7 @@ spec('cupoftea', function () {
             assert.equal(x, 22);
         });
 
-        spec('inner b fails', function () {
+        spec('inner b (failing)', function () {
             d('inner inner b');
             x++;
             assert.equal(x, 22);
@@ -40,14 +40,14 @@ spec('cupoftea', function () {
         x = 20;
     });
 
-    spec('should not call', function () {
+    spec('should not call (failing)', function () {
         d('should not call');
         setTimeout(shouldNotCall(), 1000);
         assert.equal(x, 10);
     });
 
     spec("should not call and isn't", function () {
-        d('should not call');
+        d('should not call ---------------');
         shouldNotCall();
         assert.equal(x, 10);
     });
@@ -60,7 +60,7 @@ spec('cupoftea', function () {
         assert.equal(x, 10);
     });
 
-    spec('should call but exception thrown', function () {
+    spec('should call but exception thrown (failing)', function () {
         d('should call');
         setTimeout(shouldCall(function () {
             d('stuff');
@@ -69,7 +69,7 @@ spec('cupoftea', function () {
         assert.equal(x, 10);
     });
 
-    spec("should call but isn't", function () {
+    spec("should call but isn't (failing)", function () {
         d('should call');
         shouldCall(function () {
             d('stuff');

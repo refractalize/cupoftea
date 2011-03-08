@@ -12,6 +12,7 @@ var d = function (msg) {
 var SpecDefinition = function (desc, parentSpec, index) {
     var childSpecs = [];
     var specsRun = 0;
+    var firstRun = true;
 
     var findChildSpecByDescription = function (desc) {
         debug('childSpecs:');
@@ -27,6 +28,9 @@ var SpecDefinition = function (desc, parentSpec, index) {
         addSpec: function (desc, definition) {
             var existingSpec = findChildSpecByDescription(desc);
             if (existingSpec) {
+                if (firstRun) {
+                    throw new Error('this spec seems to be a duplicate: ' + desc);
+                }
                 debug('found spec: ' + existingSpec.description());
                 debug('specs run: ' + specsRun);
                 debug('spec index: ' + existingSpec.index());
@@ -70,6 +74,7 @@ var SpecDefinition = function (desc, parentSpec, index) {
             return finished && specsRun === childSpecs.length;
         },
         end: function () {
+            firstRun = false;
             if (childSpecs.length > specsRun && childSpecs[specsRun].isFinished()) {
                 specsRun++;
             }
@@ -257,7 +262,6 @@ shouldCall = function (f) {
 };
 
 process.addListener('exit', function () {
-    //console.log('exiting');
     _(runStacks).each(function (runStack) {
         runStack.assertAllCallbacks();
     });
@@ -266,5 +270,7 @@ process.addListener('exit', function () {
 process.on('uncaughtException', function(err) {
     if (!_(expectedExceptions).contains(err)) {
         throw err;
+    } else {
+        console.log('caught exception');
     }
 });

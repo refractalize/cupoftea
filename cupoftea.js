@@ -117,8 +117,26 @@ var TopSpec = function (runStack) {
     }
 };
 
+var OutstandingCallbacks = function () {
+    var currentCallbackId = 0;
+    var callbacks = {};
+
+    this.add = function () {
+        callbacks[currentCallbackId] = true;
+        return currentCallbackId++;
+    };
+
+    this.remove = function (id) {
+        delete callbacks[id];
+    };
+
+    this.isEmpty = function () {
+        return _.isEmpty(callbacks);
+    };
+};
+
 var Callbacks = function (runStack) {
-    var numberOfCallbacks = 0;
+    var outstandingCallbacks = new OutstandingCallbacks();
     var currentSpecResultsCalled = false;
     var hasCallbacks = false;
 
@@ -139,9 +157,9 @@ var Callbacks = function (runStack) {
 
     this.shouldCall = function (f) {
         hasCallbacks = true;
-        numberOfCallbacks++;
+        var callbackId = outstandingCallbacks.add();
         return function () {
-            numberOfCallbacks--;
+            outstandingCallbacks.remove(callbackId);
             try {
                 var result = f.apply(null, arguments);
             } catch (e) {
@@ -150,7 +168,7 @@ var Callbacks = function (runStack) {
                 throw e;
             }
 
-            if (numberOfCallbacks === 0) {
+            if (outstandingCallbacks.isEmpty()) {
                 results();
             }
 
@@ -163,7 +181,7 @@ var Callbacks = function (runStack) {
     };
 
     this.assertCallbacks = function () {
-        if (numberOfCallbacks > 0) {
+        if (!outstandingCallbacks.isEmpty()) {
             results('not called');
         } else if (hasCallbacks) {
             results();
@@ -269,7 +287,7 @@ process.addListener('exit', function () {
 
 process.on('uncaughtException', function(err) {
     if (!_(expectedExceptions).contains(err)) {
-        throw err;
+        console.log(err);
     } else {
         console.log('caught exception');
     }

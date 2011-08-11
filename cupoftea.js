@@ -271,6 +271,9 @@ spec = function (desc, definition) {
     currentRunStack.spec(desc, definition);
 };
 
+unused_spec = function () {
+};
+
 shouldNotCall = function () {
     return currentRunStack.shouldNotCall();
 };

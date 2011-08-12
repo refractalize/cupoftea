@@ -97,7 +97,7 @@ var TopSpec = function (runStack) {
                 runStack.runSpec(function () {
                     runStack.pushCurrentSpec(spec, definition);
                 },function (spec, exception) {
-                    printResult(spec.fullDescription(), exception);
+                    results.print(spec.fullDescription(), exception);
                 });
             } while (!spec.isFinished());
         },
@@ -230,23 +230,46 @@ var RunStack = function () {
     };
 
     this.results = function (exception) {
-        printResult(deepestSpec.fullDescription(), exception);
+        results.print(deepestSpec.fullDescription(), exception);
     };
 };
 
-var printResult = function (desc, exception) {
-    if (!exception) {
-        sys.print(desc + " [0;32mOK[0m\n");
-    } else {
-        sys.print(desc + " [0;31mFAILED[0m\n");
-        if (exception.stack) {
-            sys.print(exception.stack + "\n");
+var SimpleResults = function () {
+    this.print = function (desc, exception) {
+        if (!exception) {
+            sys.print(desc + " [0;32mOK[0m\n");
         } else {
-            sys.print(exception + "\n");
+            sys.print(desc + " [0;31mFAILED[0m\n");
+            if (exception.stack) {
+                sys.print(exception.stack + "\n");
+            } else {
+                sys.print(exception + "\n");
+            }
+            sys.print("\n");
         }
-        sys.print("\n");
-    }
+    };
+    
+    this.wrapup = function () {
+    };
 };
+
+var RspecResults = function () {
+    var exceptions = [];
+    
+    this.print = function (desc, exception) {
+        if (!exception) {
+            sys.print('.');
+        } else {
+            sys.print('F');
+        }
+    };
+    
+    this.wrapup = function () {
+        sys.print("\n");
+    };
+};
+
+var results = new RspecResults();
 
 var TopLevelRunStack = function () {
     this.spec = function (desc, definition) {
@@ -284,6 +307,7 @@ process.addListener('exit', function () {
     _(runStacks).each(function (runStack) {
         runStack.assertAllCallbacks();
     });
+    results.wrapup();
 });
 
 process.on('uncaughtException', function(err) {

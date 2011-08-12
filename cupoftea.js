@@ -97,12 +97,7 @@ var TopSpec = function (runStack) {
                 runStack.runSpec(function () {
                     runStack.pushCurrentSpec(spec, definition);
                 },function (spec, exception) {
-                    if (!exception) {
-                        sys.print(spec.fullDescription() + " [0;32;40mOK[0m\n");
-                    } else {
-                        sys.print(spec.fullDescription() + " [0;31mFAILED[0m\n");
-                        sys.print(exception + "\n");
-                    }
+                    printResult(spec.fullDescription(), exception);
                 });
             } while (!spec.isFinished());
         },
@@ -235,19 +230,22 @@ var RunStack = function () {
     };
 
     this.results = function (exception) {
-        var desc = deepestSpec.fullDescription();
-        if (!exception) {
-            sys.print(desc + " [0;32;40mOK[0m\n");
-        } else {
-            sys.print(desc + " [0;31mFAILED[0m\n");
-            if (exception.stack) {
-                sys.print(exception.stack + "\n");
-            } else {
-                sys.print(exception + "\n");
-            }
-            sys.print("\n");
-        }
+        printResult(deepestSpec.fullDescription(), exception);
     };
+};
+
+var printResult = function (desc, exception) {
+    if (!exception) {
+        sys.print(desc + " [0;32mOK[0m\n");
+    } else {
+        sys.print(desc + " [0;31mFAILED[0m\n");
+        if (exception.stack) {
+            sys.print(exception.stack + "\n");
+        } else {
+            sys.print(exception + "\n");
+        }
+        sys.print("\n");
+    }
 };
 
 var TopLevelRunStack = function () {

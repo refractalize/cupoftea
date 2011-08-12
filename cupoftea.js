@@ -97,7 +97,7 @@ var TopSpec = function (runStack) {
                 runStack.runSpec(function () {
                     runStack.pushCurrentSpec(spec, definition);
                 },function (spec, exception) {
-                    results.print(spec.fullDescription(), exception);
+                    results.print(spec, exception);
                 });
             } while (!spec.isFinished());
         },
@@ -230,12 +230,13 @@ var RunStack = function () {
     };
 
     this.results = function (exception) {
-        results.print(deepestSpec.fullDescription(), exception);
+        results.print(deepestSpec, exception);
     };
 };
 
 var SimpleResults = function () {
-    this.print = function (desc, exception) {
+    this.print = function (spec, exception) {
+        var desc = spec.fullDescription();
         if (!exception) {
             sys.print(desc + " [0;32mOK[0m\n");
         } else {
@@ -256,7 +257,7 @@ var SimpleResults = function () {
 var RspecResults = function () {
     var exceptions = [];
     
-    this.print = function (desc, exception) {
+    this.print = function (spec, exception) {
         if (!exception) {
             sys.print('.');
         } else {

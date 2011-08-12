@@ -256,17 +256,22 @@ var SimpleResults = function () {
 
 var RspecResults = function () {
     var exceptions = [];
+    var passes = 0;
     
     this.print = function (spec, exception) {
         if (!exception) {
             sys.print('.');
+            passes++;
         } else {
             sys.print('F');
+            exceptions.push({spec: spec, exception: exception});
         }
     };
     
     this.wrapup = function () {
         sys.print("\n");
+        sys.print("\n");
+        sys.print('Specs: ' + (exceptions.length + passes) + ' Passed: ' + passes + ' Failed: ' + exceptions.length + '\n');
     };
 };
 

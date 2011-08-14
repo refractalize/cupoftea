@@ -116,8 +116,8 @@ var OutstandingCallbacks = function () {
     var currentCallbackId = 0;
     var callbacks = {};
 
-    this.add = function () {
-        callbacks[currentCallbackId] = true;
+    this.add = function (error) {
+        callbacks[currentCallbackId] = error;
         return currentCallbackId++;
     };
 
@@ -127,6 +127,10 @@ var OutstandingCallbacks = function () {
 
     this.isEmpty = function () {
         return _.isEmpty(callbacks);
+    };
+    
+    this.first = function () {
+        return callbacks[0];
     };
 };
 
@@ -152,7 +156,7 @@ var Callbacks = function (runStack) {
 
     this.shouldCall = function (f) {
         hasCallbacks = true;
-        var callbackId = outstandingCallbacks.add();
+        var callbackId = outstandingCallbacks.add(new Error('not called'));
         return function () {
             outstandingCallbacks.remove(callbackId);
             try {
@@ -177,7 +181,7 @@ var Callbacks = function (runStack) {
 
     this.assertCallbacks = function () {
         if (!outstandingCallbacks.isEmpty()) {
-            results('not called');
+            results(outstandingCallbacks.first());
         } else if (hasCallbacks) {
             results();
         }

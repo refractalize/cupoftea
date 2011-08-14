@@ -268,8 +268,24 @@ var RspecResults = function () {
         }
     };
     
+    var printExceptions = function () {
+        _(exceptions).each (function (ex) {
+            sys.print('\n');
+            sys.print('    ' + ex.spec.fullDescription() + ' [0;31mFAILED[0m\n\n');
+            
+            if (ex.exception.stack) {
+                sys.print(ex.exception.stack + "\n");
+            } else {
+                sys.print(ex.exception + "\n");
+            }
+        });
+    };
+    
     this.wrapup = function () {
         sys.print("\n");
+        
+        printExceptions();
+        
         sys.print("\n");
         sys.print('Specs: ' + (exceptions.length + passes) + ' Passed: ' + passes + ' Failed: ' + exceptions.length + '\n');
     };

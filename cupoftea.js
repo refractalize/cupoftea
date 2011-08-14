@@ -268,15 +268,21 @@ var RspecResults = function () {
         }
     };
     
+    var indent = function (text) {
+        return text.replace(/\n/g, '\n    ');
+    };
+    
     var printExceptions = function () {
         _(exceptions).each (function (ex) {
             sys.print('\n');
-            sys.print('    ' + ex.spec.fullDescription() + ' [0;31mFAILED[0m\n\n');
+            sys.print(ex.spec.fullDescription() + ' [0;31mFAILED[0m\n\n');
             
             if (ex.exception.stack) {
-                sys.print(ex.exception.stack + "\n");
+                var stack = indent(ex.exception.stack);
+                sys.print('    ' + stack + "\n");
             } else {
-                sys.print(ex.exception + "\n");
+                var msg = indent(ex.exception);
+                sys.print('    ' + msg + "\n");
             }
         });
     };
@@ -335,7 +341,5 @@ process.addListener('exit', function () {
 process.on('uncaughtException', function(err) {
     if (!_(expectedExceptions).contains(err)) {
         console.log(err);
-    } else {
-        console.log('caught exception');
     }
 });

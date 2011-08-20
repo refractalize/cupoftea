@@ -42,7 +42,7 @@ spec('cupoftea', function () {
 
     spec('should not call (failing)', function () {
         d('should not call');
-        setTimeout(shouldNotCall(), 1000);
+        process.nextTick(shouldNotCall());
         assert.equal(x, 10);
     });
 
@@ -54,18 +54,18 @@ spec('cupoftea', function () {
 
     spec('should call', function () {
         d('should call');
-        setTimeout(shouldCall(function () {
+        process.nextTick(shouldCall(function () {
             d('stuff');
-        }), 1000);
+        }));
         assert.equal(x, 10);
     });
 
     spec('should call but exception thrown (failing)', function () {
         d('should call');
-        setTimeout(shouldCall(function () {
+        process.nextTick(shouldCall(function () {
             d('stuff');
             throw new Error('exception!');
-        }), 1000);
+        }));
         assert.equal(x, 10);
     });
 

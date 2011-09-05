@@ -344,6 +344,10 @@ process.addListener('exit', function () {
 
 process.on('uncaughtException', function(err) {
     if (!_(expectedExceptions).contains(err)) {
-        console.log(err);
+        if (err.stack) {
+            console.log(err.stack);
+        } else {
+            console.log(err);
+        }
     }
 });

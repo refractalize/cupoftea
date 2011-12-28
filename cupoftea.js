@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var sys = require('sys');
+var util = require('util');
 
 var debug = function (msg) {
     //console.log(msg);
@@ -242,15 +243,15 @@ var SimpleResults = function () {
     this.print = function (spec, exception) {
         var desc = spec.fullDescription();
         if (!exception) {
-            sys.print(desc + " [0;32mOK[0m\n");
+            process.stdout.write(desc + " [0;32mOK[0m\n");
         } else {
-            sys.print(desc + " [0;31mFAILED[0m\n");
+            process.stdout.write(desc + " [0;31mFAILED[0m\n");
             if (exception.stack) {
-                sys.print(exception.stack + "\n");
+                process.stdout.write(exception.stack + "\n");
             } else {
-                sys.print(exception + "\n");
+                process.stdout.write(exception + "\n");
             }
-            sys.print("\n");
+            process.stdout.write("\n");
         }
     };
     
@@ -264,10 +265,10 @@ var RspecResults = function () {
     
     this.print = function (spec, exception) {
         if (!exception) {
-            sys.print('.');
+            process.stdout.write('.');
             passes++;
         } else {
-            sys.print('F');
+            process.stdout.write('F');
             exceptions.push({spec: spec, exception: exception});
         }
     };
@@ -278,26 +279,26 @@ var RspecResults = function () {
     
     var printExceptions = function () {
         _(exceptions).each (function (ex) {
-            sys.print('\n');
-            sys.print(ex.spec.fullDescription() + ' [0;31mFAILED[0m\n\n');
+            process.stdout.write('\n');
+            process.stdout.write(ex.spec.fullDescription() + ' [0;31mFAILED[0m\n\n');
             
             if (ex.exception.stack) {
                 var stack = indent(ex.exception.stack);
-                sys.print('    ' + stack + "\n");
+                process.stdout.write('    ' + stack + "\n");
             } else {
-                var msg = indent(ex.exception);
-                sys.print('    ' + msg + "\n");
+                var msg = util.inspect(ex.exception);
+                process.stdout.write('    ' + msg + "\n");
             }
         });
     };
     
     this.wrapup = function () {
-        sys.print("\n");
+        process.stdout.write("\n");
         
         printExceptions();
         
-        sys.print("\n");
-        sys.print('Specs: ' + (exceptions.length + passes) + ' Passed: ' + passes + ' Failed: ' + exceptions.length + '\n');
+        process.stdout.write("\n");
+        process.stdout.write('Specs: ' + (exceptions.length + passes) + ' Passed: ' + passes + ' Failed: ' + exceptions.length + '\n');
     };
 };
 
@@ -314,6 +315,8 @@ var TopLevelRunStack = function () {
         } while (!spec.isFinished());
 
         currentRunStack = this;
+        
+        results.wrapup();
     };
 };
 
@@ -339,7 +342,6 @@ process.addListener('exit', function () {
     _(runStacks).each(function (runStack) {
         runStack.assertAllCallbacks();
     });
-    results.wrapup();
 });
 
 process.on('uncaughtException', function(err) {

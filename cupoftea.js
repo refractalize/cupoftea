@@ -1,5 +1,4 @@
 var _ = require('underscore');
-var sys = require('sys');
 var util = require('util');
 
 var debug = function (msg) {

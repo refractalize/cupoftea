@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var util = require('util');
+var argv = require('optimist').argv;
 
 var debug = function (msg) {
     //console.log(msg);
@@ -308,7 +309,12 @@ var RspecResults = function () {
     };
 };
 
-var results = new SimpleResults();
+var resultFormatters = {
+  'simple': SimpleResults,
+  'rspec': RspecResults
+};
+
+var results = new (resultFormatters[argv.format || 'rspec'])();
 
 var TopLevelRunStack = function () {
     this.spec = function (desc, definition) {

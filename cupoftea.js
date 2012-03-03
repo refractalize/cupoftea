@@ -157,7 +157,12 @@ var Callbacks = function (runStack) {
     this.shouldCall = function (f) {
         hasCallbacks = true;
         var callbackId = outstandingCallbacks.add(new Error('not called'));
+        
+        var runStack = currentRunStack;
+        
         return function () {
+            var oldRunStack = currentRunStack;
+            currentRunStack = runStack;
             outstandingCallbacks.remove(callbackId);
             try {
                 var result = f.apply(null, arguments);
@@ -170,6 +175,8 @@ var Callbacks = function (runStack) {
             if (outstandingCallbacks.isEmpty()) {
                 results();
             }
+            
+            currentRunStack = oldRunStack;
 
             return result;
         };
@@ -301,7 +308,7 @@ var RspecResults = function () {
     };
 };
 
-var results = new RspecResults();
+var results = new SimpleResults();
 
 var TopLevelRunStack = function () {
     this.spec = function (desc, definition) {

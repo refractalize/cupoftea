@@ -166,7 +166,7 @@ var Callbacks = function (runStack) {
             currentRunStack = runStack;
             outstandingCallbacks.remove(callbackId);
             try {
-                var result = f.apply(null, arguments);
+                var result = f.apply(this, arguments);
             } catch (e) {
                 results(e);
                 expectedExceptions.push(e);

@@ -165,12 +165,14 @@ var Callbacks = function (runStack) {
             var oldRunStack = currentRunStack;
             currentRunStack = runStack;
             outstandingCallbacks.remove(callbackId);
-            try {
-                var result = f.apply(this, arguments);
-            } catch (e) {
-                results(e);
-                expectedExceptions.push(e);
-                throw e;
+            if(f){
+              try {
+                  var result = f.apply(this, arguments);
+              } catch (e) {
+                  results(e);
+                  expectedExceptions.push(e);
+                  throw e;
+              }
             }
 
             if (outstandingCallbacks.isEmpty()) {
